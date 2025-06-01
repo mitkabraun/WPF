@@ -1,0 +1,43 @@
+﻿<Window
+    x:Class="WPF_DrawingVisualFromThread.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:WPF_DrawingVisualFromThread.Views.Canvas"
+    Title="WPF_DrawingVisualFromThread"
+    Width="800"
+    Height="450"
+    ResizeMode="NoResize"
+    WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <c:CustomCanvas
+            Background="White"
+            ClipToBounds="True"
+            ItemsSource="{Binding Items, Mode=OneTime}"/>
+        <Border
+            Margin="6"
+            Padding="6"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Background="White"
+            BorderBrush="DarkGray"
+            BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect
+                    BlurRadius="5"
+                    Opacity=".5"
+                    RenderingBias="Quality"
+                    ShadowDepth="5"/>
+            </Border.Effect>
+            <StackPanel>
+                <TextBlock Text="Delay:"/>
+                <TextBox Text="{Binding Delay, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="FPS: "/>
+                    <TextBlock Text="{Binding Fps, Mode=OneWay}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+
+</Window>
