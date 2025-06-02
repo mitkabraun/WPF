@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,13 +16,8 @@ namespace WPF_DrawingVisualFromThread.ViewModels;
 public partial class MainWindowViewModel : ObservableObject
 {
     private readonly Random _random = new();
-    private readonly Stopwatch _fpsStopwatch = Stopwatch.StartNew();
 
-    private int _frameCount;
-
-    [ObservableProperty] private ObservableCollection<HostVisual> _items = [];
-    [ObservableProperty] private int _delay = 1;
-    [ObservableProperty] private int _fps;
+    [ObservableProperty] private ObservableCollection<object> _items = [];
 
     public MainWindowViewModel()
     {
@@ -42,57 +36,45 @@ public partial class MainWindowViewModel : ObservableObject
             using var visualTargetSource = new VisualTargetPresentationSource(hostVisual);
             while (true)
             {
-                var customCanvasItems = Step();
-                var visual = Print(customCanvasItems);
+                var canvasItems = Step();
+                var visual = Print(canvasItems);
                 visualTargetSource.RootVisual = visual;
-                UpdateFpsCounterAsync();
-                await Task.Delay(Delay);
+                await Task.Delay(25);
             }
         });
         Dispatcher.Run();
     }
 
-    private void UpdateFpsCounterAsync()
-    {
-        _frameCount++;
-        if (_fpsStopwatch.Elapsed.TotalSeconds >= 1)
-        {
-            Fps = _frameCount;
-            _frameCount = 0;
-            _fpsStopwatch.Restart();
-        }
-    }
-
-    private List<CustomCanvasItem> Step()
+    private List<CanvasItem> Step()
     {
         const int columns = 157;
         const int rows = 83;
 
-        var customCanvasItems = new List<CustomCanvasItem>();
+        var canvasItems = new List<CanvasItem>();
         for (var i = 0; i < columns; i++)
             for (var j = 0; j < rows; j++)
-            {
-                var point = new Point(i * 5, j * 5);
-                var next = _random.Next(0, 3);
-                Brush brush = next switch
+                canvasItems.Add(new CanvasItem
                 {
-                    0 => Brushes.Green,
-                    1 => Brushes.Yellow,
-                    _ => Brushes.Red
-                };
-                customCanvasItems.Add(new CustomCanvasItem(point, brush));
-            }
-        return customCanvasItems;
+                    Point = new Point(i * 5, j * 5),
+                    Brush = _random.Next(0, 3) switch
+                    {
+                        0 => Brushes.Green,
+                        1 => Brushes.Yellow,
+                        _ => Brushes.Red
+                    }
+                });
+        return canvasItems;
     }
 
-    private Visual Print(List<CustomCanvasItem> customCanvasItems)
+    private Visual Print(List<CanvasItem> canvasItems)
     {
+        var size = new Size(4, 4);
         var drawingVisual = new DrawingVisual();
         using var drawingContext = drawingVisual.RenderOpen();
-        foreach (var customCanvasItem in customCanvasItems)
+        foreach (var canvasItem in canvasItems)
         {
-            var rect = new Rect(customCanvasItem.Point, new Size(4, 4));
-            drawingContext.DrawRectangle(customCanvasItem.Brush, null, rect);
+            var rect = new Rect(canvasItem.Point, size);
+            drawingContext.DrawRectangle(canvasItem.Brush, null, rect);
         }
         return drawingVisual;
     }
