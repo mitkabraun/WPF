@@ -1,0 +1,19 @@
+﻿<Window
+    x:Class="WPF_DrawingVisual.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:canvas="clr-namespace:WPF_DrawingVisual.Views.Canvas"
+    Title="WPF_DrawingVisual"
+    Width="800"
+    Height="450"
+    ResizeMode="NoResize"
+    WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <canvas:CustomCanvas
+            Background="White"
+            ClipToBounds="True"
+            ItemsSource="{Binding Items, Mode=OneTime}"/>
+    </Grid>
+
+</Window>
